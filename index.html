@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Upload Progress Bar</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous" />
+    <style>
+      button {
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background-color: orange;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container text-center mt-4">
+      <div class="row row-cols-lg-1 justify-content-center">
+        <!-- Form -->
+        <div class="container">
+          <input type="file" accept=".png, .jpg" id="file" />
+          <button id="upload-btn">업로드</button>
+        </div>
+        <!-- Progress Bar -->
+        <div class="container mt-3">
+          <progress id="progress-bar" value="0" max="100" style="width: 400px; height: 50px"></progress><br />
+          <label for="progress-bar">0%</label>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const uploadFile = document.getElementById("file")
+      const uploadBtn = document.getElementById("upload-btn")
+      const progressBar = document.getElementById("progress-bar")
+
+      uploadBtn.addEventListener("click", () => {
+        const userImg = uploadFile.files[0]
+
+        const payload = new FormData()
+        payload.append("user-image", userImg, "user-image.jpg")
+
+        const req = new XMLHttpRequest()
+
+        req.open("POST", "https://httpbin.org/post")
+
+        req.upload.addEventListener("progress", (e) => {
+          const percentComplete = (e.loaded / e.total) * 100
+
+          progressBar.setAttribute("value", percentComplete)
+
+          progressBar.nextElementSibling.nextElementSibling.innerText = Math.round(percentComplete) + "%"
+        })
+
+        req.addEventListener("load", function () {
+          console.log(req.status)
+
+          console.log(req.response)
+        })
+
+        req.send(payload)
+      })
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8" crossorigin="anonymous"></script>
+  </body>
+</html>
